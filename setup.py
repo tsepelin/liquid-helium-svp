@@ -1,16 +1,19 @@
 from setuptools import setup
 
 setup(
-    name='LHE',
-    version='0.1.0',
-    description='A example Python package',
-    url='github link',
-    author='Viktor Tsepelin',
+    name='liquid_helium_svp',
+    version='24.9',
+    description='Python package describing liquid helium-4 properties at saturated vapour pressure',
+    url='https://github.com/tsepelin/liquid-helium-svp/tree/main/liquid_helium_svp',
+    authors=['Viktor Tsepelin',
+            'Theo Noble',
+            'Erik Tsepelin',
+            ],
     author_email='v.tsepelin@lancaster.ac.uk',
     license='MIT',
-    packages=['Liquid_helium' ],
-    install_requires=['mpi4py>=2.0',
-                      'numpy',
+    packages=['liquid_helium_svp' ],
+    install_requires=['numpy',
+                      'scipy',
                       ],
 
     classifiers=[

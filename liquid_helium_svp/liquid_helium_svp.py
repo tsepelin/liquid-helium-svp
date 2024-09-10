@@ -5,9 +5,8 @@ Modified on Thursday 28/10/2016 by TsepelinV
 library should take in arguments as float, list, numpy arrays or Pandas
 @author: noblemt
 """
-import numpy as np
 from scipy import interpolate
-import mod_oscillator as osc
+import numpy as np
 
 ########################################################################
 ###     Constants
@@ -27,12 +26,47 @@ density_Tlambda = 0.1461087 # g/cm**3
 density_Tzero = 0.1451397 # g/cm**3
 Heat_Latent_evaporation = 2.6e3 # J/l @4.2K
 
-# Rotons constants
-mass_effective_rotons = 0.16 * molar_mass * atomic_mass_unit * 1.0e3
-energy_gap_rotonsK = 8.68 #[K]
-velocity_rotons = 160 #[m/s]
-momentum_rotons = 1.94e10 * Plankbar_const #[kg m s^{-1}]
+######################################################################
+### decorator function
+######################################################################
 
+def validate_input_data_types(func):
+    def wrapper(*args):
+        def list2array(list_input):
+            return np.array(list_input)
+
+        def array2list(array_input):
+            return array_input.tolist()
+
+        def single2array(single_input):
+            return np.array([single_input])
+
+        def array2single(array_input):
+            return array_input[0]
+
+        treated_args = []
+        for arg in args:
+            if not isinstance(arg, (list, np.ndarray, float, int)):
+                raise ValueError("Unsupported data type. Please use list, numpy array, float, or int.")
+            if isinstance(arg, list):
+                treated_args.append(array2list(func(list2array(arg))))
+            elif isinstance(arg, (float, int)):
+                treated_args.append(array2single(func(single2array(arg))))
+            else:
+                treated_args.append(func(arg))
+        if len(args)==1:
+            return treated_args[0]
+        else:
+            return treated_args
+    return wrapper
+
+
+##############################################################
+### helium properties functions
+##############################################################
+
+
+@validate_input_data_types
 def density(TemperatureK):
     """For a given temperature[K] function returns the helium-4 density [kg m^3].
 
@@ -40,12 +74,6 @@ def density(TemperatureK):
     J. Phys. Chem. Ref. Data 27, 1217 (1998); http://dx.doi.org/10.1063/1.556028
    'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
    """
-
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     rho = np.tile(np.NaN, len(TemperatureK)) # array of NaN
 
@@ -72,7 +100,7 @@ def density(TemperatureK):
 
     return rho * 1000
 
-
+@validate_input_data_types
 def density_superfluid(TemperatureK):
     """Performs spline fit to interpolate the superfluid density.
 
@@ -91,12 +119,6 @@ def density_superfluid(TemperatureK):
                   1.095E-1, 8.15E-2, 5.30E-2, 2.1E-2, 8.904576E-3, 3.053214E-3,
                   1.494043E-3, 8.342826E-4, 5.10686E-4, 2.8379E-4, 1.287426E-4,
                   5.202569E-5, 2.153580E-5, 8.564206E-6, 3.567958E-6,0])
-
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     density_superfluid = np.tile(np.NaN,len(TemperatureK)) # array of NaN
 
@@ -147,6 +169,7 @@ def density_normalfluid(TemperatureK):
     return np.subtract(rho_he, rho_sup_he)
 
 
+@validate_input_data_types
 def viscosity(TemperatureK):
     """For a given temperature[K] array returns the helium-4 viscosity[Pa s].
     not very accurate?
@@ -168,12 +191,6 @@ def viscosity(TemperatureK):
                    3.564378E-6, 3.486451E-6, 3.270547E-6, 3.226615E-6,
                    3.160000E-6])
 
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
-
     viscosity = np.tile(np.NaN,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(viscosity)):
@@ -181,6 +198,8 @@ def viscosity(TemperatureK):
 
     return viscosity # Pa s
 
+
+@validate_input_data_types
 def friction_mutual_B(TemperatureK):
     """For a given temperature[K] array returns the helium-4 friction coefficient B.
 
@@ -195,12 +214,6 @@ def friction_mutual_B(TemperatureK):
     c =  np.array([1.31928144433, 1.12452707801, 0.639314792565, 0.313383532495,
                    -0.162687403543, 0.092047691284, 0.188452616588])
 
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
-
     Temperature_reduced = 1.0 - TemperatureK/T_Lambda
     friction_B = np.tile(np.NaN,len(TemperatureK)) # array of NaN
 
@@ -212,6 +225,8 @@ def friction_mutual_B(TemperatureK):
 
     return friction_B # Pa s
 
+
+@validate_input_data_types
 def friction_mutual_B_prime(TemperatureK):
     """For a given temperature[K] array returns the helium-4 mutual friction coefficient B prime.
 
@@ -227,11 +242,6 @@ def friction_mutual_B_prime(TemperatureK):
     c =  np.array([-8.47218032526e-2, 0.931621715174, 0.973263359433, 1.10543591819,
                    1.15904485127, 1.18311634566, 1.17480594214, 1.19458392766])
 
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     Temperature_reduced = 1.0 - TemperatureK/T_Lambda
     friction_B_prime = np.tile(np.NaN,len(TemperatureK)) # array of NaN
@@ -244,6 +254,8 @@ def friction_mutual_B_prime(TemperatureK):
 
     return friction_B_prime # Pa s
 
+
+@validate_input_data_types
 def friction_mutual_alpha(TemperatureK):
     """For a given temperature[K] array returns the helium-4 friction coefficient alpha = B *rho_n/2 rho.
 
@@ -251,16 +263,13 @@ def friction_mutual_alpha(TemperatureK):
     J. Phys. Chem. Ref. Data 27, 1217 (1998); http://dx.doi.org/10.1063/1.556028
     'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
     """
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     friction_B = friction_mutual_B(TemperatureK) # array of NaN
 
     return friction_B*density_normalfluid(TemperatureK)/(2.0*density(TemperatureK))
 
+
+@validate_input_data_types
 def friction_mutual_alpha(TemperatureK):
     """For a given temperature[K] array returns the helium-4 friction coefficient alpha = B *rho_n/2 rho.
     values not correct at high temperature???
@@ -269,11 +278,6 @@ def friction_mutual_alpha(TemperatureK):
     J. Phys. Chem. Ref. Data 27, 1217 (1998); http://dx.doi.org/10.1063/1.556028
     'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
     """
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     friction_B = friction_mutual_B(TemperatureK)
     density_normalfluid_arr = density_normalfluid(TemperatureK)
@@ -281,6 +285,7 @@ def friction_mutual_alpha(TemperatureK):
 
     return friction_B*density_normalfluid_arr/(2.0*density_arr)
 
+@validate_input_data_types
 def friction_mutual_alpha_prime(TemperatureK):
     """For a given temperature[K] array returns the helium-4 friction coefficient alpha = B_prime *rho_n/2 rho.
     values not correct at high temperature???
@@ -290,10 +295,6 @@ def friction_mutual_alpha_prime(TemperatureK):
     'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
     """
     # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
 
     friction_B_prime = friction_mutual_B_prime(TemperatureK)
     density_normalfluid_arr = density_normalfluid(TemperatureK)
@@ -302,7 +303,7 @@ def friction_mutual_alpha_prime(TemperatureK):
     return friction_B_prime*density_normalfluid_arr/(2.0*density_arr)
 
 
-
+@validate_input_data_types
 def pressure_SVP(TemperatureK):
     """For a given temperature[K] array returns the helium-4 vapour pressure[Pa].
 
@@ -321,12 +322,6 @@ def pressure_SVP(TemperatureK):
                    9279.1, 15370, 23480, 37355, 57050, 87170, 132825, 179650,
                    211567])
 
-    # change float into numpy array for function len() to work
-    try:
-        len(TemperatureK)
-    except:
-        TemperatureK = np.array([TemperatureK])
-
     PressurePa = np.tile(np.NaN,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(PressurePa)):
@@ -335,6 +330,7 @@ def pressure_SVP(TemperatureK):
     return PressurePa # Pa
 
 
+@validate_input_data_types
 def temperature_from_pressure_SVP(PressurePa):
     """For a given (helium-4 vapour) pressure [Pa] returns corresponding temperature [K].
 -    will return an array of temperature values for an 1D array of pressures
@@ -343,12 +339,6 @@ def temperature_from_pressure_SVP(PressurePa):
 -    J. Phys. Chem. Ref. Data 27, 1217 (1998); http://dx.doi.org/10.1063/1.556028
 -    'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
 -    """
-
-    # change float into numpy array for function len() to work
-    try:
-        len(PressurePa)
-    except:
-        PressurePa = np.array([PressurePa])
 
     Temperature = np.tile(np.NaN,len(PressurePa)) # array of NaN
 
@@ -379,6 +369,8 @@ def temperature_from_pressure_SVP(PressurePa):
 
     return Temperature # [K]
 
+
+@validate_input_data_types
 def sound_velocity_first(TemperatureK):
     """
     Calculates the first sound velocity of helium-4 for a given temperature
@@ -393,17 +385,13 @@ def sound_velocity_first(TemperatureK):
                   2.176634, 2.175663, 2.174367, 2.173641, 2.175712, 2.176713, 2.178168, 2.179702, 2.181464, 2.187212,
                   2.193106, 2.216496, 2.238243, 2.056185, 1.795017]) * 1e2
 
-    try:
-        len(TemperatureK)
-    except TypeError as e:
-        TemperatureK = np.array([TemperatureK])
-
     first_sound = np.zeros(len(TemperatureK))
 
     for temp_index in range(len(TemperatureK)):
         first_sound[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
 
     return first_sound
+
 
 def sound_velocity_first_from_pressure_low_temperature(pressurePa, temperatureK):
     '''
@@ -429,7 +417,7 @@ def sound_velocity_first_from_pressure_low_temperature(pressurePa, temperatureK)
 
     return np.array(c)
 
-
+@validate_input_data_types
 def sound_velocity_second(TemperatureK):
     """
     Calculates the second sound velocity of helium-4 for a given temperature
@@ -446,11 +434,6 @@ def sound_velocity_second(TemperatureK):
 				  1.921708e1, 1.575245e1, 1.192157e1, 8.953338, 6.771458, 5.506380, 4.456879, 3.840343, 2.542421,
 				  1.957438, 1.427086, 1.001273, 6.743104e-2, 4.565972e-2, 3.519492e-2, 2.088277e-2, 1.059874e-2, 0.0])
 
-    try:
-        len(TemperatureK)
-    except TypeError as e:
-        TemperatureK = np.array([TemperatureK])
-
     second_sound = np.zeros(len(TemperatureK))
 
     for temp_index in range(len(TemperatureK)):
@@ -458,6 +441,8 @@ def sound_velocity_second(TemperatureK):
 
     return second_sound
 
+
+@validate_input_data_types
 def specific_heat_SVP(TemperatureK):
     """
     Calculates the specific heat of helium-4 for a given temperature at saturated vapour pressure
@@ -485,9 +470,6 @@ def specific_heat_SVP(TemperatureK):
     c2 = np.array([1.900539, 1.862865, 1.822431, 1.759056, 1.679157, 1.584631, 1.464344, 1.274043, 1.095050,
                    9.546039e-1, 9.503531e-1, 1.100724, 1.260996, 1.421360, 1.609738, 1.732672])
 
-    if type(TemperatureK) is float:
-        TemperatureK = np.array([TemperatureK])
-
     # Calc the base 10 log of the molar heat capacity at SVP
     log10_c = []
     for temp in np.nditer(TemperatureK):
@@ -503,225 +485,3 @@ def specific_heat_SVP(TemperatureK):
 
     return c
 
-def viscous_penetration_depth(FrequencyHz, TemperatureK):
-    """
--    Calculates the viscous penetration depth for a given oscillator with frequency(Hz) in helium 4.
--
--    Uses delta = sqrt(eta/(density_nf * pi * omega)
--
--    FrequencyHz: frequency of oscillator
--    TemperatureK: temperature of helium fluid at SVP
--    """
-
-    deltaM = osc.viscous_penetration_depth(FrequencyHz, viscosity(TemperatureK), density_normalfluid(TemperatureK))
-    return deltaM
-
-def mean_free_path_rotons(TemperatureK, energy_gap_rotons=energy_gap_rotonsK*Boltzmann_const,
-                          momentum_rotons=momentum_rotons):
-    """
-    Calculates the mean free path of the rotons in He4
-    JLTP 76, 387 (1989) Morishita et al.
-
-    1.15e-4 / (np.pi * roton_density) * np.sqrt(np.pi * roton_mass / (2 * Boltzmann_const * TemperatureK)
-
-    :param TemperatureK: [K}
-    :param energy_gap_rotons:
-    :param momentum_rotons:
-    :return: mean_free_path [m]
-    """
-
-    return 1.0e-1 * 3.45e-4 * np.pi * Plankbar_const**3 / momentum_rotons**4 * np.exp(energy_gap_rotons / (Boltzmann_const * TemperatureK))
-
-
-
-def resonance_frequency(TemperatureK, Coeff_beta, Coeff_b, Vacuum_Frequency_Hz, Osc_density, Osc_area, Osc_volume):
-    """
--    Returns the expected resonance frequency of the resonator in liquid helium at SVP
--
--    TemperatureK: temperature of helium
--    Coeff_beta: geometrical coefficient for backflow term
--    Coeff_b: geometrical coefficient for viscous clamping term
--    Vacuum_Frequency_Hz: vacuum frequency of the resonator
--    Osc_density: [kg/m^3] density of resonator
--    Osc_area_m2: [m^2] area of oscillator
--    Osc_volume: [m^3] volume of the resonator
--
--    Equation from from Blaauwgeers and Blazkova et all paper.
--    Quartz Tuning Fork: Thermometer, Pressure- and Viscometer for Helium Liquids, JLTP 146, 537 (2007)
--    doi:10.1007/s10909-006-9279-4
--    """
-
-    f0 = (osc.resonance_frequency_fluid(Coeff_beta, Coeff_b, Vacuum_Frequency_Hz, Osc_density, Osc_area,
-            Osc_volume, density(TemperatureK), density_normalfluid(TemperatureK), viscosity(TemperatureK)))
-    return f0
-
-def resonance_width(TemperatureK, Coeff_C, Frequency_Hz, Vacuum_Frequency_Hz, mass_vacuum_kg, Osc_area_m2):
-    """
-    Returns the theoretical value for the hydrodynamic resonance width in Helium-4 at SVP.
-
-   TemperatureK: temperature of helium
-    Coeff_C: geometrical coefficient: C = 2 for ideal cylinder
-    Frequency_Hz: frequency of the resonator
-    Vacuum_Frequency_Hz: vacuum frequency of the resonator
-   mass_vacuum_kg: [kg] effective mass of resonator
-    Osc_area_m2: [m^2] area of oscillator
-
-   check description in oscillator.hydrodynamic_damping_width
-    Equation from from Blaauwgeers and Blazkova et all paper.
-   Quartz Tuning Fork: Thermometer, Pressure- and Viscometer for Helium Liquids, JLTP 146, 537 (2007)
-   doi:10.1007/s10909-006-9279-4
-    """
-
-    delta_f = (osc.hydrodynamic_damping_width(Coeff_C, Frequency_Hz, Vacuum_Frequency_Hz, mass_vacuum_kg,
-    Osc_area_m2, density_normalfluid(TemperatureK), viscosity(TemperatureK)))
-    return delta_f
-
-def resonance_width_cylinder(radius_m, amplitude_m, length_m, viscosity, mass_effective_kg, viscous_penetration_length):
-    """
--    not finished properly 28/10/2016
--
--    Returns the theoretical value for the hydrodynamic resonance width.
--
--    Fit from Grishenko paper.
--    """
-
-    coeff_C = 0.577 # Euler constant
-
-    delta_f = 4 * np.pi * length_m * viscosity / (2 * np.pi * mass_effective_kg * (0.5 - coeff_C - np.log( 2*radius_m * amplitude_m / viscous_penetration_length**2)))
-    return delta_f
-
-
-
-def resonance_width_phonons(diameter_beam, density_beam, TemperatureK, GeometryConstant_beam = 2.67, pressure='SVP'):
-    """
-    Returns the theoretical value for the phonon resonance width in Helium-4 at SVP.
-
-    diameter_beam: beam dimension
-    density_beam: average density of the beam
-    TemperatureK: temperature of helium
-    GeometryConstant_beam: geometrical coefficient: C = 2.67 for a cylinder
-
-    """
-
-    try:
-        len(TemperatureK)
-    except TypeError as e:
-        TemperatureK = np.array([TemperatureK])
-
-    width_phonons = np.tile(np.NaN,len(TemperatureK)) # array of NaN
-
-    if pressure == 'SVP':
-        c = sound_velocity_first(TemperatureK)
-        density = density_superfluid(TemperatureK)
-    else:
-        c = sound_velocity_first_from_pressure_low_temperature(pressure, TemperatureK)
-        # Low temperature helium-4 is practically entirely superfluid
-        density = density_from_pressure_low_temperature(pressure, TemperatureK)
-
-    for temp_index in range(len(TemperatureK)):
-        width_phonons[temp_index] = GeometryConstant_beam / 45.0 * Boltzmann_const**4 / \
-                                    (Plankbar_const**3 * c**4 * diameter_beam *(density_beam + density)) \
-                                    * TemperatureK[temp_index]**4
-
-    if len(TemperatureK) == 1:
-        return width_phonons[0]
-    else:
-        return width_phonons
-
-def resonance_width_rotons(diameter_beam, density_beam, TemperatureK, GeometryConstant_beam = 2.67, momentum_rotons = momentum_rotons,
-                           velocity_rotons=velocity_rotons, mass_effective_rotons = mass_effective_rotons, energy_gap_rotonsK = energy_gap_rotonsK):
-    """
-    Returns the theoretical value for the roton resonance width in Helium-4 at SVP.
-
-    diameter_beam: beam dimension
-    density_beam: average density of the beam
-    TemperatureK: temperature of helium
-    GeometryConstant_beam: geometrical coefficient: C = 2.67 for a cylinder
-    #Edited by Andrew Guthrie 15/2/18 - to be checked
-
-    """
-
-    try:
-        len(TemperatureK)
-    except TypeError as e:
-        TemperatureK = np.array([TemperatureK])
-
-    width_rotons = np.tile(np.NaN,len(TemperatureK)) # array of NaN
-
-    for temp_index in range(len(TemperatureK)):
-        width_rotons[temp_index] = (((GeometryConstant_beam * velocity_rotons * momentum_rotons**4 / Plankbar_const**4 * Plankbar_const**1) /
-        (3*np.pi** 2 * diameter_beam * (density_beam + density_superfluid(TemperatureK[temp_index])))) *
-        np.sqrt((mass_effective_rotons) / (8 * np.pi ** 3 * Boltzmann_const * TemperatureK[temp_index])) * np.exp(-energy_gap_rotonsK/TemperatureK[temp_index]))
-
-
-    if len(TemperatureK) == 1:
-        return width_rotons[0]
-    else:
-        return width_rotons
-
-def resonance_width_acoustic_dipole(diameter_beam, density_beam, frequency_beam, TemperatureK, GeometryConstant = 1):
-    """
-    Returns the theoretical value for the acoustic resonance width in Helium-4 at SVP.
-
-    diameter_beam: beam dimension
-    density_beam: average density of the beam
-    TemperatureK: temperature of helium
-    GeometryConstant_beam: geometrical coefficient: C = 2.67 for a cylinder
-    #Edited by Andrew Guthrie 15/2/18 - to be checked
-
-    """
-
-    try:
-        len(TemperatureK)
-    except TypeError as e:
-        TemperatureK = np.array([TemperatureK])
-
-    width_acoustic = np.tile(np.NaN,len(TemperatureK)) # array of NaN
-
-    for temp_index in range(len(width_acoustic)):
-        width_acoustic[temp_index] = GeometryConstant * np.pi**3 * density(TemperatureK[temp_index]) * diameter_beam**2 * frequency_beam**3 / \
-        (2 * density_beam * sound_velocity_first(TemperatureK[temp_index])**2)
-
-    if len(width_acoustic) == 1:
-        return width_acoustic[0]
-    else:
-        return width_acoustic
-
-def resonance_width_acoustic_dipole_vs_frequency(diameter_beam, density_beam, frequency_beam, TemperatureK, GeometryConstant = 1):
-    """
-    Returns the theoretical value for the acoustic resonance width as a function of frequency in Helium-4 at SVP.
-
-    diameter_beam: beam dimension
-    density_beam: average density of the beam
-    TemperatureK: temperature of helium
-    GeometryConstant_beam: geometrical coefficient: C = 2.67 for a cylinder
-    #Edited by Andrew Guthrie 15/2/18 - to be checked
-
-    """
-
-    try:
-        len(frequency_beam)
-    except TypeError as e:
-        frequency_beam = np.array([frequency_beam])
-
-    width_acoustic = np.tile(np.NaN,len(frequency_beam)) # array of NaN
-
-    for temp_index in range(len(width_acoustic)):
-        width_acoustic[temp_index] = GeometryConstant * np.pi**3 * density(TemperatureK) * diameter_beam**2 * frequency_beam[temp_index]**3 /\
-                                                        (2 * density_beam * sound_velocity_first(TemperatureK)**2)
-
-    if len(width_acoustic) == 1:
-        return width_acoustic[0]
-    else:
-        return width_acoustic
-
-
-
-"""
-def vel_error(qerr, q, amperr, amp, widtherr, width, v, merr = 0.02):
-
-    verr = np.multiply(np.divide(v, 2),
-                       np.sqrt(np.add(np.add(np.power(np.divide(qerr,q),2),np.power(np.divide(amperr,amp),2)),np.add(np.power(np.divide(widtherr,width),2),merr**2))))
-
-    return verr
-"""
