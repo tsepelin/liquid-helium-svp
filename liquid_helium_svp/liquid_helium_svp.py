@@ -91,7 +91,7 @@ def density(TemperatureK):
     delta_rho_belTl = (np.polyval(a_belTl,t) * np.log(np.absolute(t)) + np.polyval(b_belTl,t))
 
     #For temperatures above the lambda point
-    a_abTl = np.array([ 5.057051, -7.94605,0]) * 1e-3
+    a_abTl = np.array([ 5.07051, -7.94605, 0]) * 1e-3
     b_abTl = np.array([-0.308182, 1.53454, -2.45749, 0.240720, -3.00636, -10.2326, -30.3511,0]) * 1e-3
     delta_rho_abTl = (np.polyval(a_abTl,t) * np.log(np.absolute(t)) + np.polyval(b_abTl,t))
 
@@ -100,6 +100,7 @@ def density(TemperatureK):
     rho = (TemperatureK > np.tile(1.334,len(TemperatureK))) * rho_above1p334 + (TemperatureK < np.tile(1.334,len(TemperatureK))) * rho_below1p334
 
     return rho * 1000
+
 
 @validate_input_data_types
 def density_superfluid(TemperatureK):
@@ -624,8 +625,8 @@ def specific_heat_SVP(TemperatureK):
 class TestLiquidHeliumSVP(unittest.TestCase):
 
     def test_density(self):
-        TemperatureK = np.array([0.0, 2.15, 4.2])
-        np.testing.assert_almost_equal(density(TemperatureK), np.array([145.1397, 145.9840, 125.4018]), decimal=4)
+        TemperatureK = np.array([0.0, 2.15, 4.2, 4.9])
+        np.testing.assert_almost_equal(density(TemperatureK), np.array([145.1397, 145.9840, 125.4075, 106.0033]), decimal=4)
 
 
 if __name__ == '__main__':
