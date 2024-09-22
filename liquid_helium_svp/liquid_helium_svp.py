@@ -5,8 +5,9 @@ Modified on Thursday 28/10/2016 by TsepelinV
 library should take in arguments as float, list, numpy arrays or Pandas
 @author: noblemt
 """
-from scipy import interpolate
 import numpy as np
+from scipy import interpolate
+import unittest
 
 ########################################################################
 ###     Constants
@@ -619,3 +620,13 @@ def specific_heat_SVP(TemperatureK):
 
     return c
 
+
+class TestLiquidHeliumSVP(unittest.TestCase):
+
+    def test_density(self):
+        TemperatureK = np.array([0.0, 2.15, 4.2])
+        np.testing.assert_almost_equal(density(TemperatureK), np.array([145.1397, 145.9840, 125.4018]), decimal=4)
+
+
+if __name__ == '__main__':
+    unittest.main()
