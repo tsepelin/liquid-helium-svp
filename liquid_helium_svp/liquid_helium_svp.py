@@ -369,6 +369,91 @@ def temperature_from_pressure_SVP(PressurePa):
 
     return Temperature # [K]
 
+@validate_input_data_types
+def surface_tension(TemperatureK):
+    """
+    Calculates the surface tension of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The surface tension in N/m
+    """
+    k = np.array([0.000000, 0.000000, 0.000000, 0.000000, 6.482413e-4, 2.004234, 2.176800, 2.176800, 2.178377, 2.412388,
+                  2.412896, 3.807062, 4.868895, 5.035567, 5.195767, 5.195767, 5.195767, 5.195767])
+    c = np.array([3.543998e-4, 3.545090e-4, 3.524383e-4, 3.366694e-4, 2.921292e-4, 2.860852e-4, 2.796835e-4, 2.747804e-4,
+                  2.346234e-4, 1.357632e-4, 5.361123e-5, 1.263761e-5, 3.795854e-6, 5.599775e-12])
+
+    surface_tension = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        surface_tension[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return surface_tension
+
+
+@validate_input_data_types
+def ion_mobilities(TemperatureK):
+    """
+    Calculates the surface tension of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The surface tension in N/m
+    """
+    k = np.array([3.513060e-2, 3.513060e-2, 3.513060e-2, 3.513060e-2, 5.875667e-2, 1.179363e-1, 1.537502e-1, 1.649872e-1,
+                  6.623561e-1, 8.008330e-1, 8.281207e-1, 9.599097e-1, 1.152959, 1.351840, 1.607292, 2.021290, 2.176597,
+                  2.186372, 2.189764, 2.374662, 3.014612, 4.660651, 4.838042, 5.105466, 5.186798, 5.186798, 5.186798,
+                  5.186798])
+    c = np.array([7.033374e-4, 6.736553e-4, 5.158198e-4, 4.508211e-4, 4.002894e-4, 2.552750e-4, 2.496965e-4, 1.466750e-4,
+                  1.088565e-4, 4.892824e-5, 1.064366e-5, 4.138096e-5, 8.747069e-5, 1.058640e-4, 1.326369e-4, 1.474489e-4,
+                  1.522085e-4,1.603564e-4, 681873e-4, 1.700160e-4, 1.756753e-4,  1.768276e-4, 1.801619e-4, 1.804100e-4])
+
+    ion_moblities = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        ion_moblities[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return ion_moblities
+
+
+@validate_input_data_types
+def dispersion(TemperatureK):
+    """
+    Calculates the surface tension of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The surface tension in N/m
+    """
+    k = np.array([0.0894, 0.0894, 0.0894, 0.0894, 0.15, 0.510, 1.60, 2.023, 2.42, 2.665, 3.60, 3.60, 3.60, 3.60])
+    c = np.array([1.53895, 1.932, 4.8, 14.85, 14.88, 5.9384, 16.5014, 17.72455, 18.43656, 18.43545])
+
+    dispersion = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        dispersion[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return dispersion
+
+
+@validate_input_data_types
+def structure_factor(TemperatureK):
+    """
+    Calculates the surface tension of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The surface tension in N/m
+    """
+    k = np.array([0.000000e00, 0.000000e00, 0.000000e00, 0.000000e00, 7.467679e-01, 8.843175e-01, 1.171682e00,
+                  1.483348e00, 1.615547e00, 1.954501e00, 2.269539e00, 2.738304e00, 4.266671e00, 4.686186e00,
+                  6.660000e00, 6.660000e00, 6.660000e00, 6.660000e00])
+    c = np.array([5.098474e-02, 8.713372e-02, 1.381343e-01, 2.211584e-01, 3.034749e-01, 5.022945e-01, 7.050370e-01,
+                  1.644316e00, 1.146399e00, 8.365880e-01, 1.045785e00, 9.733701e-01, 1.020061e-00, 1.004961e00])
+
+    structure_factor = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        structure_factor[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return structure_factor
+
 
 @validate_input_data_types
 def sound_velocity_first(TemperatureK):
@@ -440,6 +525,55 @@ def sound_velocity_second(TemperatureK):
         second_sound[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
 
     return second_sound
+
+
+@validate_input_data_types
+def sound_velocity_fourth(TemperatureK):
+    """
+    Calculates the fourth sound velocity of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The second sound velocity in m/s
+
+	based on Donnelly and Barenghi
+    """
+    k = np.array([1.190093, 1.190093, 1.190093, 1.190093, 1.622630, 1.770580, 1.936770, 2.042310, 2.129610,
+				  2.161789, 2.176800, 2.176800, 2.176800, 2.176800])
+    c = np.array([2.346992e2, 2.317649e2, 2.235997e2, 1.972721e2, 1.746328e2, 1.437044e2, 1.120775e2, 7.758563e1,
+				  4.689201e1, -1.786538e-8])
+
+    fourth_sound = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        fourth_sound[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return fourth_sound
+
+@validate_input_data_types
+def enthalpy(TemperatureK):
+    """
+    Calculates the second sound velocity of helium-4 for a given temperature
+
+    :param TemperatureK: The temperature in Kelvin
+    :return: The second sound velocity in m/s
+
+	based on Donnelly and Barenghi
+    """
+    k = np.array([0.000000, 0.000000, 0.000000, 0.000000, 0.100000, 0.200000, 0.300000, 0.370000, 0.500000,
+                  0.610000, 0.743950, 0.870000, 1.027550, 1.250000, 1.500000, 1.750000, 2.000000, 2.130000,
+                  2.190120, 2.232940, 2.854200, 4.000000, 4.900000, 4.900000, 4.900000, 4.900000])
+    c = np.array([0.000, 0.000, -1.65000e-06, 1.801000e-05, 1.185000e-04, 4.108550e-04, 1.033200e-03,
+                  2.710000e-03, 6.090000e-03, 1.784000e-02, 6.032740e-02, 2.400500e-01, 8.643720e-01,
+                  2.445400e+00, 5.554360e00, 8.800000e00, 1.220130E01, 1.558100E01, 2.004000E01,
+                  3.223100e01, 4.704640e01, 5.848930e01])
+
+    enthalpy = np.zeros(len(TemperatureK))
+
+    for temp_index in range(len(TemperatureK)):
+        enthalpy[temp_index] = interpolate.splev(TemperatureK[temp_index], (k, c, 3))
+
+    return enthalpy
+
 
 
 @validate_input_data_types
