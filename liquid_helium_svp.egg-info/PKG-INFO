@@ -73,6 +73,19 @@ Russell J. Donnelly and Carlo F. Barenghi
 J. Phys. Chem. Ref. Data 27, 1217 (1998); http://dx.doi.org/10.1063/1.556028
 "The Observed Properties of Liquid Helium at the Saturated Vapor Pressure"
 
+
+In addition to the replication of the publication, the module has a function to infer temperature of liquid helium from saturated vapour pressure. 
+
+```python
+import liquid_helium_svp as helium
+
+temperature = 4.2 #K
+
+print(f'Liquid helium at {temperature_float} K has vapour pressure of {lhesvp.pressure_SVP(temperature):.2f} Pa')
+print(f'Liquid helium vapour pressure {lhesvp.pressure_SVP(temperature):.2f} Pa correspond to temperature of {lhesvp.temperature_from_pressure_SVP(lhesvp.pressure_SVP(temperature)):.2f} K')
+```
+
+
 ## License
 
 MIT
