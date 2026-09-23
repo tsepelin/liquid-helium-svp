@@ -76,7 +76,7 @@ def density(TemperatureK):
    'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
    """
 
-    rho = np.tile(np.NaN, len(TemperatureK)) # array of NaN
+    rho = np.tile(np.nan, len(TemperatureK)) # array of NaN
 
     t = TemperatureK - np.tile(T_Lambda, len(TemperatureK))
 
@@ -122,7 +122,7 @@ def density_superfluid(TemperatureK):
                   1.494043E-3, 8.342826E-4, 5.10686E-4, 2.8379E-4, 1.287426E-4,
                   5.202569E-5, 2.153580E-5, 8.564206E-6, 3.567958E-6,0])
 
-    density_superfluid = np.tile(np.NaN,len(TemperatureK)) # array of NaN
+    density_superfluid = np.tile(np.nan,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(density_superfluid)):
         density_superfluid[tempindex] = interpolate.splev(TemperatureK[tempindex], (k, c, 3), ext = 1) * 1e3 #kg/m**3
@@ -193,7 +193,7 @@ def viscosity(TemperatureK):
                    3.564378E-6, 3.486451E-6, 3.270547E-6, 3.226615E-6,
                    3.160000E-6])
 
-    viscosity = np.tile(np.NaN,len(TemperatureK)) # array of NaN
+    viscosity = np.tile(np.nan,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(viscosity)):
         viscosity[tempindex] = interpolate.splev(TemperatureK[tempindex], (k, c, 3))
@@ -217,7 +217,7 @@ def friction_mutual_B(TemperatureK):
                    -0.162687403543, 0.092047691284, 0.188452616588])
 
     Temperature_reduced = 1.0 - TemperatureK/T_Lambda
-    friction_B = np.tile(np.NaN,len(TemperatureK)) # array of NaN
+    friction_B = np.tile(np.nan,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(friction_B)):
         if TemperatureK[tempindex] > 2.167:
@@ -246,7 +246,7 @@ def friction_mutual_B_prime(TemperatureK):
 
 
     Temperature_reduced = 1.0 - TemperatureK/T_Lambda
-    friction_B_prime = np.tile(np.NaN,len(TemperatureK)) # array of NaN
+    friction_B_prime = np.tile(np.nan,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(friction_B_prime)):
         if TemperatureK[tempindex] > 2.134:
@@ -310,7 +310,7 @@ def pressure_SVP(TemperatureK):
                    9279.1, 15370, 23480, 37355, 57050, 87170, 132825, 179650,
                    211567])
 
-    PressurePa = np.tile(np.NaN,len(TemperatureK)) # array of NaN
+    PressurePa = np.tile(np.nan,len(TemperatureK)) # array of NaN
 
     for tempindex in range(len(PressurePa)):
         PressurePa[tempindex] = interpolate.splev(TemperatureK[tempindex], (k, c, 3))
@@ -328,7 +328,7 @@ def temperature_from_pressure_SVP(PressurePa):
 -    'The Observed Properties of Liquid Helium at the Saturated Vapor Pressure'
 -    """
 
-    Temperature = np.tile(np.NaN,len(PressurePa)) # array of NaN
+    Temperature = np.tile(np.nan,len(PressurePa)) # array of NaN
 
     P_lambda = pressure_SVP(T_Lambda) # pressure at lambda point
 
@@ -596,7 +596,7 @@ def specific_heat_SVP(TemperatureK):
         if temp < T_Lambda:
             log10_c.append(interpolate.splev(temp, (k1, c1, 3)))
         elif temp == T_Lambda:
-            log10_c.append(np.NaN)
+            log10_c.append(np.nan)
         else:
             log10_c.append(interpolate.splev(temp, (k2, c2, 3)))
 
