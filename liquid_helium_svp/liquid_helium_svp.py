@@ -6,6 +6,7 @@ library should take in arguments as float, list, numpy arrays or Pandas
 @author: noblemt
 """
 import numpy as np
+from numpy import typing as npt
 from scipy import interpolate
 import unittest
 
@@ -68,7 +69,7 @@ def validate_input_data_types(func):
 
 
 @validate_input_data_types
-def density(TemperatureK):
+def density(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] function returns the helium-4 density [kg m^3].
 
     based on Russell J. Donnelly and Carlo F. Barenghi
@@ -103,7 +104,7 @@ def density(TemperatureK):
 
 
 @validate_input_data_types
-def density_superfluid(TemperatureK):
+def density_superfluid(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """Performs spline fit to interpolate the superfluid density.
 
     based on Russell J. Donnelly and Carlo F. Barenghi
@@ -129,10 +130,10 @@ def density_superfluid(TemperatureK):
 
     return density_superfluid
 
-def density_from_pressure_low_temperature(pressurePa, temperatureK):
+def density_from_pressure_low_temperature(pressurePa: npt.ArrayLike, temperatureK: npt.ArrayLike) -> npt.ArrayLike:
     '''
     Uses model to find the denisty of helium as function of pressure. From low temperature data in:
-    Abraham B M, Eckstein Y, Ketterson J B, Kuchnir M and Roach P R 1970 Phys. Rev. A 1 (2) 50
+    Abraham B M, Eckstein Y, Ketterson J B, Kuchnir M and Roach P R 1970 Phys. Rev. A 1 (2) 250
 
     :param pressurePa: Pressure in Pa
     :param temperatureK: temperature in K
@@ -160,7 +161,7 @@ def density_from_pressure_low_temperature(pressurePa, temperatureK):
     return np.asarray(densities).reshape(pressurePa.shape)
 
 
-def density_normalfluid(TemperatureK):
+def density_normalfluid(TemperatureK: npt.ArrayLike) -> np.ndarray:
     """Uses the suprefluid density to work out the normal fluid density.
    Returns the whole fluid density above the lambda point."""
     #Works out whole fluid density and subtracts the superfluid density.
@@ -172,7 +173,7 @@ def density_normalfluid(TemperatureK):
 
 
 @validate_input_data_types
-def viscosity(TemperatureK):
+def viscosity(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 viscosity[Pa s].
     not very accurate?
 
@@ -202,7 +203,7 @@ def viscosity(TemperatureK):
 
 
 @validate_input_data_types
-def friction_mutual_B(TemperatureK):
+def friction_mutual_B(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 friction coefficient B.
 
 
@@ -229,7 +230,7 @@ def friction_mutual_B(TemperatureK):
 
 
 @validate_input_data_types
-def friction_mutual_B_prime(TemperatureK):
+def friction_mutual_B_prime(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 mutual friction coefficient B prime.
 
 
@@ -258,7 +259,7 @@ def friction_mutual_B_prime(TemperatureK):
 
 
 @validate_input_data_types
-def friction_mutual_alpha(TemperatureK):
+def friction_mutual_alpha(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 friction coefficient alpha = B *rho_n/2 rho.
     values not correct at high temperature???
 
@@ -273,8 +274,9 @@ def friction_mutual_alpha(TemperatureK):
 
     return friction_B*density_normalfluid_arr/(2.0*density_arr)
 
+
 @validate_input_data_types
-def friction_mutual_alpha_prime(TemperatureK):
+def friction_mutual_alpha_prime(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 friction coefficient alpha = B_prime *rho_n/2 rho.
     values not correct at high temperature???
 
@@ -292,7 +294,7 @@ def friction_mutual_alpha_prime(TemperatureK):
 
 
 @validate_input_data_types
-def pressure_SVP(TemperatureK):
+def pressure_SVP(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """For a given temperature[K] array returns the helium-4 vapour pressure[Pa].
 
     based on Russell J. Donnelly and Carlo F. Barenghi
@@ -319,7 +321,7 @@ def pressure_SVP(TemperatureK):
 
 
 @validate_input_data_types
-def temperature_from_pressure_SVP(PressurePa):
+def temperature_from_pressure_SVP(PressurePa: npt.ArrayLike) -> npt.ArrayLike:
     """For a given (helium-4 vapour) pressure [Pa] returns corresponding temperature [K].
 -    will return an array of temperature values for an 1D array of pressures
 -
@@ -358,7 +360,7 @@ def temperature_from_pressure_SVP(PressurePa):
     return Temperature # [K]
 
 @validate_input_data_types
-def surface_tension(TemperatureK):
+def surface_tension(TemperatureK: npt.ArrayLike ) -> npt.ArrayLike:
     """
     Calculates the surface tension of helium-4 for a given temperature
 
@@ -379,7 +381,7 @@ def surface_tension(TemperatureK):
 
 
 @validate_input_data_types
-def ion_mobilities(TemperatureK):
+def ion_mobilities(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the surface tension of helium-4 for a given temperature
 
@@ -403,7 +405,7 @@ def ion_mobilities(TemperatureK):
 
 
 @validate_input_data_types
-def dispersion(TemperatureK):
+def dispersion(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the surface tension of helium-4 for a given temperature
 
@@ -422,7 +424,7 @@ def dispersion(TemperatureK):
 
 
 @validate_input_data_types
-def structure_factor(TemperatureK):
+def structure_factor(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the surface tension of helium-4 for a given temperature
 
@@ -444,7 +446,7 @@ def structure_factor(TemperatureK):
 
 
 @validate_input_data_types
-def sound_velocity_first(TemperatureK):
+def sound_velocity_first(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the first sound velocity of helium-4 for a given temperature
 
@@ -466,10 +468,11 @@ def sound_velocity_first(TemperatureK):
     return first_sound
 
 
-def sound_velocity_first_from_pressure_low_temperature(pressurePa, temperatureK):
+def sound_velocity_first_from_pressure_low_temperature(pressurePa: npt.ArrayLike, temperatureK: npt.ArrayLike) \
+        -> np.ndarray:
     '''
     Uses model to find the first sound velocity of helium-4 as function of pressure. From low temperature data in:
-    Abraham B M, Eckstein Y, Ketterson J B, Kuchnir M and Roach P R 1970 Phys. Rev. A 1 (2) 50
+    Abraham B M, Eckstein Y, Ketterson J B, Kuchnir M and Roach P R 1970 Phys. Rev. A 1 (2) 250
 
     :param pressurePa: Pressure in Pa
     :param temperatureK: temperature in K
@@ -488,8 +491,9 @@ def sound_velocity_first_from_pressure_low_temperature(pressurePa, temperatureK)
 
     return np.sqrt(1.01325e2 * velocity)
 
+
 @validate_input_data_types
-def sound_velocity_second(TemperatureK):
+def sound_velocity_second(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the second sound velocity of helium-4 for a given temperature
 
@@ -514,7 +518,7 @@ def sound_velocity_second(TemperatureK):
 
 
 @validate_input_data_types
-def sound_velocity_fourth(TemperatureK):
+def sound_velocity_fourth(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the fourth sound velocity of helium-4 for a given temperature
 
@@ -535,8 +539,9 @@ def sound_velocity_fourth(TemperatureK):
 
     return fourth_sound
 
+
 @validate_input_data_types
-def enthalpy(TemperatureK):
+def enthalpy(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the second sound velocity of helium-4 for a given temperature
 
@@ -561,9 +566,8 @@ def enthalpy(TemperatureK):
     return enthalpy
 
 
-
 @validate_input_data_types
-def specific_heat_SVP(TemperatureK):
+def specific_heat_SVP(TemperatureK: npt.ArrayLike) -> npt.ArrayLike:
     """
     Calculates the specific heat of helium-4 for a given temperature at saturated vapour pressure
 
